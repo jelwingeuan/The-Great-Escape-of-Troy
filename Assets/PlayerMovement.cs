@@ -2,19 +2,15 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField]
-    private float speed = 5f;
+    [SerializeField] private float speed = 1000f;
+    [SerializeField] private float mouseSensitivity = 200f;
 
-    [SerializeField]
-    private float mouseSensitivity = 2f;
-
-    private Vector3 moveDirection;
     private float rotationY;
 
     void Update()
     {
-        HandleMovement();
         HandleRotation();
+        HandleMovement();
     }
 
     private void HandleMovement()
@@ -22,16 +18,18 @@ public class PlayerMovement : MonoBehaviour
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
 
-        moveDirection = new Vector3(horizontal, 0f, vertical).normalized;
+        // Move relative to where the player is facing
+        Vector3 move = transform.forward * vertical + transform.right * horizontal;
+        move.Normalize();
 
-        transform.Translate(moveDirection * speed * Time.deltaTime);
+        transform.position += move * speed * Time.deltaTime;
     }
 
     private void HandleRotation()
     {
         float mouseX = Input.GetAxis("Mouse X");
-        rotationY += mouseX * mouseSensitivity;
 
+        rotationY += mouseX * mouseSensitivity * Time.deltaTime;
         transform.rotation = Quaternion.Euler(0f, rotationY, 0f);
     }
 }
