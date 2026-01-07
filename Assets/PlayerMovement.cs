@@ -1,11 +1,19 @@
 using UnityEngine;
 
+[RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] private float speed = 1000f;
+    [SerializeField] private float speed = 300f;     
     [SerializeField] private float mouseSensitivity = 200f;
 
+    private CharacterController controller;
     private float rotationY;
+
+    void Awake()
+    {
+        controller = GetComponent<CharacterController>();
+        Cursor.lockState = CursorLockMode.Locked;
+    }
 
     void Update()
     {
@@ -15,19 +23,17 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleMovement()
     {
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
+        float horizontal = -Input.GetAxisRaw("Horizontal");
+        float vertical   = -Input.GetAxisRaw("Vertical");
 
-        // Move relative to where the player is facing
-        Vector3 move = transform.forward * vertical + transform.right * horizontal;
-        move.Normalize();
-
-        transform.position += move * speed * Time.deltaTime;
+        Vector3 move = (transform.right * horizontal + transform.forward * vertical).normalized;
+        controller.Move(move * speed * Time.deltaTime);
     }
 
     private void HandleRotation()
     {
-        float mouseX = Input.GetAxis("Mouse X");
+
+        float mouseX = -Input.GetAxis("Mouse X");
 
         rotationY += mouseX * mouseSensitivity * Time.deltaTime;
         transform.rotation = Quaternion.Euler(0f, rotationY, 0f);
